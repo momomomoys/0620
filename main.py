@@ -109,4 +109,79 @@ elif menu == "진로":
         col1, v_col, col2 = st.columns([4, 1, 4])
         with col1:
             st.markdown(f"### 🅰️ {job_a['name']}")
-            st.caption(job
+            st.caption(job_a['desc'])
+            if st.button("이게 더 좋아! 🅰️", key=f"btn_a_{current_step}", use_container_width=True):
+                st.session_state.score[job_a['name']] = st.session_state.score.get(job_a['name'], 0) + 1
+                st.session_state.step += 1
+                st.rerun()
+        with v_col:
+            st.markdown("<div class='vs-text'>VS</div>", unsafe_allow_html=True)
+        with col2:
+            st.markdown(f"### 🅱️ {job_b['name']}")
+            st.caption(job_b['desc'])
+            if st.button("이게 더 좋아! 🅱️", key=f"btn_b_{current_step}", use_container_width=True):
+                st.session_state.score[job_b['name']] = st.session_state.score.get(job_b['name'], 0) + 1
+                st.session_state.step += 1
+                st.rerun()
+
+    else:
+        st.balloons()
+        st.success("🎉 밸런스 게임 완료!")
+        best_job = max(st.session_state.score, key=st.session_state.score.get) if st.session_state.score else "스타트업 CEO (창업가)"
+        
+        final_info = {"desc": "미래를 이끌어갈 인재", "school": "홍익디자인고 등 특성화고등학교"}
+        for f in JOB_DATA:
+            for j in JOB_DATA[f]:
+                if j['name'] == best_job:
+                    final_info = j
+                    break
+                    
+        st.markdown(f"## 🏆 너의 추천 직업: **[{best_job}]**")
+        st.write(f"✨ {final_info['desc']}")
+        st.info(f"🏫 **추천 고등학교:** {final_info['school']}")
+        
+        if st.button("🔄 다시 테스트하기", use_container_width=True):
+            st.session_state.step = 0
+            st.session_state.score = {}
+            st.rerun()
+
+# ----------------- [ PAGE 3: 축구게임 ] -----------------
+elif menu == "축구게임":
+    st.title("⚽ 쉬어가는 미니 축구 게임")
+    st.metric(label="현재 축구 점수", value=f"{st.session_state.soccer_score} 점")
+    st.subheader(f"🥅 {st.session_state.soccer_msg}")
+    
+    st.write("---")
+    cols = st.columns(3)
+    
+    with cols[0]:
+        if st.button("📐 왼쪽 구석 슛", use_container_width=True):
+            if random.choice([True, False]):
+                st.session_state.soccer_msg = "🎉 골인! 구석을 완벽하게 찔렀습니다!"
+                st.session_state.soccer_score += 10
+            else:
+                st.session_state.soccer_msg = "🧤 아쉽습니다! 골키퍼 선방에 막혔습니다."
+            st.rerun()
+            
+    with cols[1]:
+        if st.button("⚡ 정면 강슛", use_container_width=True):
+            if random.choice([True, False]):
+                st.session_state.soccer_msg = "🎉 골인! 골키퍼가 손도 못 댔습니다!"
+                st.session_state.soccer_score += 10
+            else:
+                st.session_state.soccer_msg = "⚽ 쾅! 골대를 맞고 튕겨 나옵니다!"
+            st.rerun()
+            
+    with cols[2]:
+        if st.button("📐 오른쪽 구석 슛", use_container_width=True):
+            if random.choice([True, False]):
+                st.session_state.soccer_msg = "🎉 골인! 골키퍼 타이밍을 빼앗았습니다!"
+                st.session_state.soccer_score += 10
+            else:
+                st.session_state.soccer_msg = "🧤 아쉽습니다! 골키퍼가 방향을 읽었습니다."
+            st.rerun()
+            
+    if st.button("🔄 점수 초기화", key="reset_game"):
+        st.session_state.soccer_score = 0
+        st.session_state.soccer_msg = "공을 차서 골을 넣어보세요!"
+        st.rerun()

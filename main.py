@@ -1,69 +1,60 @@
 import streamlit as st
 import random
-import time
 
-# 1. 아기자기하고 화려한 스타일링을 위한 기본 세팅
+# 1. 페이지 기본 설정 및 스타일 초기화
 st.set_page_config(
-    page_title="내 미래를 찾아라! 직업 밸런스 게임",
-    page_icon="🚀",
-    layout="centered"
+    page_title="진로탐색을 위한 밸런스 게임!",
+    page_icon="🌟",
+    layout="wide"
 )
 
-# 커스텀 CSS: 중학생 취향 저격 비비드 & 파스텔 테마 (오류 수정 완료)
+# 커스텀 CSS: 보내주신 메인 화면의 블루&파스텔 톤 둥근 카드 레이아웃 재현
 st.markdown("""
     <style>
-    .main { background-color: #F9F7F1; }
-    h1 { color: #FF6B6B; text-align: center; font-family: 'Nanum Gothic', sans-serif; }
-    .sub-title { color: #4D96FF; text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; }
-    .stButton>button {
-        background: linear-gradient(135deg, #6BCB77 0%, #4D96FF 100%);
+    .main-header {
+        background-color: #1E40AF;
         color: white;
-        font-size: 1.2rem;
-        font-weight: bold;
-        border-radius: 20px;
-        padding: 20px;
-        border: none;
-        box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
+        text-align: center;
+        padding: 40px;
+        border-radius: 25px;
+        margin-bottom: 30px;
     }
-    .stButton>button:hover {
-        transform: scale(1.05);
-        box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
+    .main-header h1 { color: white; font-size: 2.5rem; margin-bottom: 10px; }
+    .card-title { font-size: 1.8rem; font-weight: bold; margin-bottom: 15px; }
+    .vs-text { font-size: 2rem; font-weight: bold; color: #F59E0B; text-align: center; margin-top: 15px; }
+    .stButton>button {
+        border-radius: 12px;
+        padding: 10px 20px;
     }
-    .vs-text { font-size: 2rem; font-weight: bold; color: #FFD93D; text-align: center; margin-top: 15px; }
-    .game-score { font-size: 1.5rem; font-weight: bold; text-align: center; color: #FF6B6B; }
     </style>
 """, unsafe_allow_html=True)
 
-# 2. 인공지능 시대 유망 직종 데이터셋
+# 2. 인공지능 시대 직업 데이터셋 (CEO, 개발자, 디자이너, PM, 데이터 사이언티스트 등)
 JOB_DATA = {
     "IT & 인공지능 분야 🤖": [
-        {"name": "AI 모델러 (인공지능 개발자)", "desc": "컴퓨터에게 사람처럼 생각하는 법을 가르치는 AI 마법사!", "school": "광운인공지능고, 선린인터넷고, 서울디지텍고"},
-        {"name": "자율주행 모빌리티 전문가", "desc": "운전자가 없어도 안전하게 달리는 자동차와 드론을 설계해요.", "school": "경기자동차과학고, 용산철도고"},
-        {"name": "메타버스 크리에이터", "desc": "가상현실 공간 속에 멋진 세상과 아바타 옷을 만들어요.", "school": "홍익디자인고, 서울영상고, 한강미디어고"},
-        {"name": "화이트 해커 (사이버 보안관)", "desc": "나쁜 해커들로부터 소중한 정보와 시스템을 지켜냅니다.", "school": "선린인터넷고, 한세사이버보안고"},
-        {"name": "데이터 사이언티스트", "desc": "인터넷 속 수많은 데이터 뒤에 숨겨진 보물을 찾아내요.", "school": "대동세무고, 선린인터넷고"}
+        {"name": "AI 개발자 (인공지능 모델러)", "desc": "컴퓨터에게 사람처럼 생각하는 법을 가르치는 마법사!", "school": "광운인공지능고, 선린인터넷고"},
+        {"name": "데이터 사이언티스트", "desc": "인터넷 속 데이터 뒤에 숨겨진 트렌드와 보물을 찾아내요.", "school": "선린인터넷고, 대동세무고"},
+        {"name": "테크 PM (프로젝트 매니저)", "desc": "개발자, 디자이너와 소통하며 멋진 기술 서비스를 기획하고 총괄해요.", "school": "미래산업과학고, 서울디지텍고"}
     ],
-    "디자인 & 미디어 분야 🎨": [
-        {"name": "UI/UX 디자이너", "desc": "스마트폰 앱을 쓸 때 가장 편리하고 예쁜 화면을 디자인해요.", "school": "홍익디자인고, 예일디자인고, 서울디자인고"},
-        {"name": "3D 영상 그래픽 디자이너", "desc": "영화나 게임 속에 나오는 화려한 3D 캐릭터와 효과를 만들어요.", "school": "홍익디자인고, 한국애니메이션고"},
-        {"name": "콘텐츠 크리에이터 (영상 편집자)", "desc": "유튜브, 틱톡 등 사람들의 시선을 사로잡는 영상을 기획하고 편집해요.", "school": "서울영상고, 한강미디어고"},
-        {"name": "이모티콘 프로듀서", "desc": "메신저에서 매일 쓰는 귀여운 캐릭터와 감정을 창조해요.", "school": "홍익디자인고, 성동글로벌경영고"}
-    ],
-    "바이오 & 환경 로봇 분야 🌱": [
-        {"name": "로봇 공학자", "desc": "인간을 도와주는 똑똑한 가사 로봇이나 재난 구조 로봇을 만들어요.", "school": "서울로봇고, 수도전기공업고"},
-        {"name": "스마트팜 운영 전문가", "desc": "IT 기술을 활용해 식물이 가장 잘 자라는 환경을 원격 제어해요.", "school": "수원농생명과학고, 한국바이오과학고"},
-        {"name": "친환경 에너지 공학자", "desc": "지구를 살리기 위해 태양광, 수소 등 깨끗한 에너지를 연구해요.", "school": "한양공업고, 울산에너지고"}
+    "디자인 & 스타트업 분야 🎨": [
+        {"name": "UI/UX 디자이너", "desc": "스마트폰 앱을 쓸 때 가장 편리하고 예쁜 화면과 경험을 설계해요.", "school": "홍익디자인고, 예일디자인고"},
+        {"name": "스타트업 CEO (창업가)", "desc": "인공지능 시대의 불편함을 해결할 새로운 비즈니스를 개척해요.", "school": "대동세무고, 서울디지텍고"}
     ]
 }
 
-# 3. 앱 상태 초기화 (Session State)
+# 3. 세부 게임 세션 상태 초기화 (문법 오류 수정)
 if "step" not in st.session_state:
     st.session_state.step = 0
+if "selected_field" not in st.session_state:
     st.session_state.selected_field = None
+if "game_jobs" not in st.session_state:
     st.session_state.game_jobs = []
+if "score" not in st.session_state:
     st.session_state.score = {}
 if "soccer_score" not in st.session_state:
     st.session_state.soccer_score = 0
 if "soccer_msg" not in st.session_state:
-    st.session_state.soccer_msg =
+    st.session_state.soccer_msg = "공을 차서 골을 넣어보세요!"
+
+# 4. 좌측 사이드바 내비게이션 구성 (이미지 화면과 매칭)
+menu =

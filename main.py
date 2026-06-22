@@ -13,7 +13,7 @@ except ImportError:
 # --- 페이지 설정 ---
 st.set_page_config(page_title="홍익디자인고 입학설명회", layout="wide")
 
-# --- 음성 재생 함수 (귀여운 여학생 말투 적용) ---
+# --- 음성 재생 함수 (HTML 오류 수정 완료) ---
 def speak(text, dept_name):
     if not gtts_available:
         return
@@ -23,13 +23,14 @@ def speak(text, dept_name):
         tts.write_to_fp(fp)
         fp.seek(0)
         audio_base64 = base64.b64encode(fp.read()).decode()
-        # 자동 재생 오디오 태그
-        audio_tag = f'<audio autoplay="true" id="audio_{dept_name}" src="data:audio/mp3;base64,{audio_base64}">'
+        
+        # autoplay="true" 문자열 오류를 방지하기 위해 표준 HTML5 속성(autoplay)으로 수정
+        audio_tag = f'<audio autoplay id="audio_{dept_name}" src="data:audio/mp3;base64,{audio_base64}">'
         st.markdown(audio_tag, unsafe_allow_html=True)
     except Exception:
         pass
 
-# --- 디자인 스타일 설정 (여학생 감성 + 홍익 레드) ---
+# --- 디자인 스타일 설정 ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
@@ -93,7 +94,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 부서별 데이터 (말투를 더 귀엽고 생생하게 수정) ---
+# --- 부서별 데이터 ---
 data = {
     "교무기획부": {
         "title": "🎨 너의 전공을 디자인해봐!",
@@ -113,13 +114,4 @@ data = {
             "자격증 취득반 방과후 수업 전액 지원 (GTQ 등)"
         ],
         "voice": "책을 읽고 나만의 멋진 그림을 그려보는 건 어때? 교육연구부에서는 너희의 인문학적 감성과 디자인 실력을 합쳐줄게! 자격증 공부도 학교에서 도와줄게, 화이팅~!",
-        "img": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=600&auto=format&fit=crop"
-    },
-    "학생안전복지부": {
-        "title": "🛍️ 동아리 활동이 제일 재밌어!",
-        "points": [
-            "창업 동아리 SPAM: 굿즈 제작부터 판매 마켓까지!",
-            "바이오메디컬 아트: 메디컬 일러스트레이터 진로 탐구!",
-            "총 40개의 힙한 동아리가 너희를 기다려!"
-        ],
-        "voice": "우리 학교 동아리 활동은 진짜
+        "img": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?

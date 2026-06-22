@@ -13,7 +13,7 @@ except ImportError:
 # --- 페이지 설정 ---
 st.set_page_config(page_title="홍익디자인고 입학설명회", layout="wide")
 
-# --- 음성 재생 함수 (HTML 오류 수정 완료) ---
+# --- 음성 재생 함수 ---
 def speak(text, dept_name):
     if not gtts_available:
         return
@@ -24,16 +24,16 @@ def speak(text, dept_name):
         fp.seek(0)
         audio_base64 = base64.b64encode(fp.read()).decode()
         
-        # autoplay="true" 문자열 오류를 방지하기 위해 표준 HTML5 속성(autoplay)으로 수정
+        # 표준 HTML5 자동재생 오디오 태그
         audio_tag = f'<audio autoplay id="audio_{dept_name}" src="data:audio/mp3;base64,{audio_base64}">'
         st.markdown(audio_tag, unsafe_allow_html=True)
     except Exception:
         pass
 
-# --- 디자인 스타일 설정 ---
+# --- 디자인 스타일 설정 (CSS) ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght=400;700&display=swap');
     html, body, [class*="css"] { font-family: 'Nanum Gothic', sans-serif; }
     
     .header-box {
@@ -114,4 +114,23 @@ data = {
             "자격증 취득반 방과후 수업 전액 지원 (GTQ 등)"
         ],
         "voice": "책을 읽고 나만의 멋진 그림을 그려보는 건 어때? 교육연구부에서는 너희의 인문학적 감성과 디자인 실력을 합쳐줄게! 자격증 공부도 학교에서 도와줄게, 화이팅~!",
-        "img": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?
+        "img": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=600&auto=format&fit=crop"
+    },
+    "학생안전복지부": {
+        "title": "🛍️ 동아리 활동이 제일 재밌어!",
+        "points": [
+            "창업 동아리 SPAM: 굿즈 제작부터 판매 마켓까지!",
+            "바이오메디컬 아트: 메디컬 일러스트레이터 진로 탐구!",
+            "총 40개의 힙한 동아리가 너희를 기다려!"
+        ],
+        "voice": "우리 학교 동아리 활동은 진짜 꿀잼이야! 친구들이랑 직접 굿즈를 만들어서 팔아보기도 하고, 신기한 메디컬 일러스트도 배울 수 있어. 학교 오는 게 매일 즐거울 거야~!",
+        "img": "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=600&auto=format&fit=crop"
+    },
+    "특성화정보부": {
+        "title": "🤖 미래를 디자인하는 AI 기술!",
+        "points": [
+            "AI 미래 디자인 한마당: 생성형 AI 실무 활용!",
+            "전국 상업경진대회 참가 적극 지원 및 특별 지도!",
+            "프리미엄 실습실과 최신 어도비 소프트웨어 지원!"
+        ],
+        "voice":

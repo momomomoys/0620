@@ -3,26 +3,22 @@ import pandas as pd
 import base64
 from io import BytesIO
 
-# --- [가장 중요] gTTS 모듈 및 시스템 실행 파일 존재 여부 2중 체크 (에러 완벽 방지) ---
-gtts_available = False
+# --- gTTS 라이브러리 설치 여부 체크 (에러 완벽 방지) ---
 try:
     from gtts import gTTS
-    import shutil
-    # 시스템에 gtts 실행 명령어가 있거나 라이브러리가 정상 호출되면 True
-    if shutil.which("gtts-cli") or gTTS:
-        gtts_available = True
-except Exception:
+    gtts_available = True
+except ImportError:
     gtts_available = False
 
 # --- 페이지 설정 ---
 st.set_page_config(page_title="홍익디자인고 입학설명회", layout="wide")
 
-# --- 음성 재생 함수 (귀여운 여학생 톤/에러 예외처리 완벽 적용) ---
+# --- 음성 재생 함수 (발랄한 여학생 톤 최적화) ---
 def speak(text, dept_name):
     if not gtts_available:
         return
     try:
-        # 느낌표와 물결표를 사용하여 한층 밝고 발랄한 여성 톤 유도
+        # 문장 끝에 문장 부호와 이모티콘을 섞어 톤을 높인 귀여운 음성을 유도합니다.
         tts = gTTS(text=text, lang='ko')
         fp = BytesIO()
         tts.write_to_fp(fp)
@@ -100,7 +96,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 부서별 데이터 (발랄한 대사 처리) ---
+# --- 부서별 데이터 ---
 data = {
     "교무기획부": {
         "title": "🎨 나의 전공을 직접 디자인해!",
@@ -145,7 +141,7 @@ data = {
     "진로교육부": {
         "title": "🎖️ 꿈의 홍대 미대, 현실이 된다!",
         "points": [
-            "🎁 본교 졸업생이 홍익대학교 미술대학 진학 시 4년 전액 장학금 파격 혜택!",
+            "🎁 本校 졸업생이 홍익대학교 미술대학 진학 시 4년 전액 장학금 파격 혜택!",
             "📈 매년 고교 전체 졸업생 중 7~10% 수준의 독보적인 홍대 진학률!",
             "🎯 입학사정관 초청 1:1 맞춤형 수시 학생부 종합 전형 진로 컨설팅!"
         ],
@@ -157,60 +153,4 @@ data = {
         "points": [
             "🇯🇵 글로벌 현장학습: 일본 오사카와 교토 무료 직무 연수 및 문화 탐방!",
             "💼 대기업 연계 직무 교육 및 넷마블, 신한 커리어온 매칭 취업 캠프!",
-            "💰 드림 성장 바우처 지급 및 국가 공인 자격증 응시 수수료 100% 지원!"
-        ],
-        "voice": "친구들~! 고등학교 다니면서 일본으로 무상 디자인 연수 떠나보고 싶지 않아? 일본 오사카와 교토로 향하는 현장 학습이 널 기다려! 취업 준비 비용은 학교가 전부 책임질게, 진짜 최고지?",
-        "img": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=600"
-    }
-}
-
-# --- 메인 화면 타이틀 ---
-st.markdown('<div class="header-box"><h1>🎨 홍익디자인고 입학설명회</h1><p style="font-size:18px;">나를 가장 멋지게 디자인하는 공간, 홍이 세 자매가 친절하게 안내할게!</p></div>', unsafe_allow_html=True)
-
-# 라이브러리가 완전히 준비되지 않았을 때 표시하는 안전 메시지
-if not gtts_available:
-    st.info("ℹ️ 현재 안내원의 음성 로딩 중이거나 텍스트 모드로 작동 중입니다. 화면 안내는 정상 작동합니다.")
-
-# 부서 선택 버튼 (상단)
-dept_names = list(data.keys())
-cols = st.columns(len(dept_names))
-selected_dept = st.session_state.get('dept', "교무기획부")
-
-for i, dept_name in enumerate(dept_names):
-    if cols[i].button(dept_name):
-        st.session_state.dept = dept_name
-        selected_dept = dept_name
-        speak(data[dept_name]["voice"], dept_name)
-
-st.divider()
-
-# --- 화면 레이아웃 (좌: 고정 배치 캐릭터 | 우: 부서 내용 및 예시 사진) ---
-col_left, col_right = st.columns([1.1, 1])
-
-with col_left:
-    # 💡 선생님이 업로드해주신 교복 입은 세 자매 일러스트 (Base64 하드코딩화 완료)
-    # 깨지거나 지워지지 않고 언제 어디서나 100% 강제 출력됩니다.
-    st.image("https://raw.githubusercontent.com/user-attachments/assets/26d2e616-43f1-4823-bc97-885b597df388")
-
-with col_right:
-    # 캐릭터 말풍선 대사창
-    st.markdown(f"""
-        <div class="chat-bubble">
-            <b>🎀 홍이 :</b><br>
-            "{data[selected_dept]['voice']}"
-        </div>
-    """, unsafe_allow_html=True)
-    
-    st.write("<br>", unsafe_allow_html=True)
-    
-    # 선택된 부서 세부 스펙 대시보드
-    st.markdown(f"### {data[selected_dept]['title']}")
-    for pt in data[selected_dept]["points"]:
-        st.markdown(f'<div class="point-card">{pt}</div>', unsafe_allow_html=True)
-    
-    # 부서 매칭 배경 사진
-    st.image(data[selected_dept]['img'])
-
-# --- 푸터 ---
-st.markdown("---")
-st.markdown("<p style='text-align: center; color: #94A3B8;'>© 2026 홍익디자인고등학교 입학설명회 입학홍보 전용 시스템</p>", unsafe_allow_html=True)
+            "💰 드림 성장 바우처

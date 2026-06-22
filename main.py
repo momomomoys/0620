@@ -3,7 +3,7 @@ import pandas as pd
 import base64
 from io import BytesIO
 
-# --- gTTS 라이브러리 설치 여부 체크 ---
+# --- gTTS 라이브러리 설치 여부 체크 (에러 완벽 방지) ---
 try:
     from gtts import gTTS
     gtts_available = True
@@ -13,30 +13,20 @@ except ImportError:
 # --- 페이지 설정 ---
 st.set_page_config(page_title="홍익디자인고 입학설명회", layout="wide")
 
-# --- 음성 재생 함수 (귀여운 여학생 톤 업그레이드) ---
+# --- 음성 재생 함수 (표준형 복구 및 안정성 최적화) ---
 def speak(text, dept_name):
     if not gtts_available:
         return
     try:
-        # 밝고 귀여운 하이톤 유도를 위해 어미 수정 및 gTTS 호출
-        tts = gTTS(text=text, lang='ko')
+        # slow=False 옵션을 기본으로 주어 발랄하고 부드럽게 재생되도록 유도합니다.
+        tts = gTTS(text=text, lang='ko', slow=False)
         fp = BytesIO()
         tts.write_to_fp(fp)
         fp.seek(0)
         audio_base64 = base64.b64encode(fp.read()).decode()
         
-        # 💡 성인 남자 목소리처럼 처지는 것을 막기 위해 오디오 재생 속도(playbackRate)를 1.15배로 높여 
-        # 한층 더 발랄하고 귀여운 여학생 목소리 톤을 강제로 만들어냅니다.
-        audio_id = f"audio_{dept_name}"
-        audio_tag = f"""
-        <audio autoplay id="{audio_id}" src="data:audio/mp3;base64,{audio_base64}"></audio>
-        <script>
-            var audio = document.getElementById("{audio_id}");
-            if (audio) {{
-                audio.playbackRate = 1.15;
-            }}
-        </script>
-        """
+        # 브라우저 토큰 에러를 방지하기 위해 가장 단순하고 표준적인 HTML5 태그만 사용
+        audio_tag = f'<audio autoplay src="data:audio/mp3;base64,{audio_base64}">'
         st.markdown(audio_tag, unsafe_allow_html=True)
     except Exception:
         pass
@@ -106,6 +96,14 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 부서별 데이터 (말투 최적화) ---
+# --- 부서별 데이터 ---
 data = {
     "교무기획부": {
+        "title": "🎨 나의 전공을 직접 디자인해!",
+        "points": [
+            "✨ 시각디자인과: 광고부터 UI 디자인까지 학년별 특화 과정!",
+            "🎬 영상애니메이션과: 웹툰과 캐릭터, 애니메이션의 성지!",
+            "🏫 내가 원하는 수업을 쏙쏙 골라 듣는 고교학점제 완벽 지원!"
+        ],
+        "voice": "안녕 친구들~! 교무기획부 홍이에요~! 우리 학교에서 너희의 꿈과 재능을 마음껏 펼칠 수 있는 멋진 수업들을 준비했어! 시각디자인이랑 영상애니메이션 중에 너는 어떤 과가 더 끌리니? 생각만 해도 너무 설레지 않아?",
+        "img": "

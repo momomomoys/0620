@@ -1,35 +1,7 @@
 import streamlit as st
-import pandas as pd
-import base64
-from io import BytesIO
-
-# --- gTTS 라이브러리 설치 여부 체크 (에러 완벽 방지) ---
-try:
-    from gtts import gTTS
-    gtts_available = True
-except ImportError:
-    gtts_available = False
 
 # --- 페이지 설정 ---
 st.set_page_config(page_title="홍익디자인고 입학설명회", layout="wide")
-
-# --- 음성 재생 함수 (표준형 복구 및 안정성 최적화) ---
-def speak(text, dept_name):
-    if not gtts_available:
-        return
-    try:
-        # slow=False 옵션을 기본으로 주어 발랄하고 부드럽게 재생되도록 유도합니다.
-        tts = gTTS(text=text, lang='ko', slow=False)
-        fp = BytesIO()
-        tts.write_to_fp(fp)
-        fp.seek(0)
-        audio_base64 = base64.b64encode(fp.read()).decode()
-        
-        # 브라우저 토큰 에러를 방지하기 위해 가장 단순하고 표준적인 HTML5 태그만 사용
-        audio_tag = f'<audio autoplay src="data:audio/mp3;base64,{audio_base64}">'
-        st.markdown(audio_tag, unsafe_allow_html=True)
-    except Exception:
-        pass
 
 # --- 디자인 스타일 설정 (CSS) ---
 st.markdown("""
@@ -95,6 +67,34 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
+
+# --- 브라우저 내장 Web Speech API 음성 재생 스크립트 함수 ---
+def play_browser_tts(text):
+    # 외부 라이브러리 없이 브라우저 자체 여성 음성 엔진을 깨워 발랄한 톤(속도 1.1, 음높이 1.2)으로 스피킹합니다.
+    js_code = f"""
+    <script>
+        if ('speechSynthesis' in window) {{
+            // 기존 재생 중인 음성 즉시 중단
+            window.speechSynthesis.cancel();
+            
+            var msg = new SpeechSynthesisUtterance("{text}");
+            msg.lang = "ko-KR";
+            msg.rate = 1.1;   // 약간 빠른 템포로 지루함 방지
+            msg.pitch = 1.2;  // 음높이를 높여 귀여운 청소년/여학생 목소리 유도
+            
+            // 한국어 여성 음성 선호 설정
+            var voices = window.speechSynthesis.getVoices();
+            for(var i = 0; i < voices.length; i++) {{
+                if(voices[i].lang === 'ko-KR' || voices[i].name.includes('Google 한국어') || voices[i].name.includes('Yuri')) {{
+                    msg.voice = voices[i];
+                    break;
+                }}
+            }}
+            window.speechSynthesis.speak(msg);
+        }}
+    </script>
+    """
+    st.markdown(js_code, unsafe_allow_html=True)
 
 # --- 부서별 데이터 ---
 data = {
